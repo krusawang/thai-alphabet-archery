@@ -1,0 +1,1548 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>เกมยิงธนู ก-ฮ เรียงลำดับพยัญชนะไทย</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #0f172a;
+      --surface: rgba(15, 23, 42, 0.86);
+      --surface-card: rgba(30, 41, 59, 0.9);
+      --border: rgba(148, 163, 184, 0.24);
+      --ink: #f8fafc;
+      --muted: #cbd5e1;
+      --brand: #f59e0b;
+      --brand-strong: #d97706;
+      --accent: #10b981;
+      --danger: #ef4444;
+      --radius: 14px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.45), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+      --font: 'Prompt', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font);
+      background: var(--bg-deep);
+      color: var(--ink);
+    }
+
+    .app-shell {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top Header HUD */
+    .hud-header {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 20;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 16px;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      pointer-events: auto;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .brand-subtitle {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Target Next Indicator */
+    .target-callout {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      padding: 6px 16px;
+      border-radius: 12px;
+    }
+
+    .target-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .target-char-badge {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .target-char-big {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--brand);
+      line-height: 1;
+      text-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+    }
+
+    .target-char-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .progress-pill {
+      font-size: 13px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      white-space: nowrap;
+    }
+
+    .hud-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface-card);
+      color: var(--ink);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.16s ease;
+    }
+
+    .btn:hover {
+      background: rgba(51, 65, 85, 0.95);
+      border-color: rgba(248, 250, 252, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #0f172a;
+      border-color: transparent;
+      font-weight: 700;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #fbbf24, #ea580c);
+      color: #0f172a;
+    }
+
+    /* Sequence Strip at Bottom */
+    .sequence-bar {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 20;
+      background: var(--surface);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      pointer-events: auto;
+    }
+
+    .sequence-track {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex: 1;
+      padding: 2px 0;
+    }
+
+    .sequence-track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .seq-node {
+      min-width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 600;
+      background: rgba(30, 41, 59, 0.75);
+      color: #64748b;
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .seq-node.done {
+      background: rgba(16, 185, 129, 0.22);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.45);
+    }
+
+    .seq-node.current {
+      background: var(--brand);
+      color: #0f172a;
+      border-color: #fde68a;
+      font-weight: 800;
+      transform: scale(1.12);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+    }
+
+    .seq-node.onscreen {
+      border-color: rgba(245, 158, 11, 0.4);
+      color: #e2e8f0;
+    }
+
+    .controls-hint {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Main Interactive Game Canvas */
+    #gameCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    /* Victory Modal Overlay */
+    .overlay-modal {
+      position: absolute;
+      inset: 0;
+      z-index: 40;
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .overlay-modal.visible {
+      display: flex;
+    }
+
+    .modal-card {
+      max-width: 460px;
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      border-radius: 20px;
+      padding: 28px;
+      text-align: center;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-badge {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      background: linear-gradient(135deg, #f59e0b, #10b981);
+      display: grid;
+      place-items: center;
+      font-size: 34px;
+    }
+
+    .modal-title {
+      margin: 0 0 8px;
+      font-size: 26px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+
+    .modal-desc {
+      margin: 0 0 22px;
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      .hud-header {
+        padding: 8px 12px;
+        gap: 8px;
+      }
+      .brand-subtitle {
+        display: none;
+      }
+      .target-char-big {
+        font-size: 24px;
+      }
+      .controls-hint {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hud-header">
+      <div class="brand-group">
+        <div class="brand-icon" aria-hidden="true">🏹</div>
+        <div>
+          <h1 class="brand-title">เกมยิงธนูพยัญชนะไทย ก–ฮ</h1>
+          <p class="brand-subtitle">เล็งและยิงตัวอักษรเรียงตามลำดับ ห้ามข้ามตัวอักษร (ลอยทีละ 7 ตัวอักษร)</p>
+        </div>
+      </div>
+
+      <div class="target-callout" aria-live="polite">
+        <div>
+          <div class="target-label">เป้าหมายที่ต้องยิงตอนนี้</div>
+          <div class="target-char-badge">
+            <span class="target-char-big" id="currentCharDisplay">ก</span>
+            <span class="target-char-name" id="currentCharName">ก ไก่</span>
+          </div>
+        </div>
+        <div class="progress-pill" id="progressDisplay">1 / 44</div>
+      </div>
+
+      <div class="hud-actions">
+        <button type="button" class="btn" id="soundToggleBtn" aria-label="เปิด/ปิดเสียง">🔊 เสียง: เปิด</button>
+        <button type="button" class="btn btn-primary" id="restartBtn">เริ่มใหม่ (ก)</button>
+      </div>
+    </header>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <footer class="sequence-bar">
+      <div class="sequence-track" id="sequenceTrack" aria-label="ลำดับพยัญชนะไทย ก ถึง ฮ"></div>
+      <div class="controls-hint">
+        <span>🎯 <strong>วิธีเล่น:</strong> เลื่อนเมาส์/นิ้วเพื่อเล็ง กดค้างเพื่อดึงสายธนู และปล่อยเพื่อยิง</span>
+      </div>
+    </footer>
+
+    <div class="overlay-modal" id="victoryModal" role="dialog" aria-modal="true" aria-labelledby="victoryTitle">
+      <div class="modal-card">
+        <div class="modal-badge">🏆</div>
+        <h2 class="modal-title" id="victoryTitle">ยอดเยี่ยม! ยิงครบ ก–ฮ สำเร็จ</h2>
+        <p class="modal-desc" id="victoryDesc">
+          คุณยิงพยัญชนะไทยเรียงตามลำดับตั้งแต่ ก ไก่ ถึง ฮ นกฮูก ครบทั้ง 44 ตัวโดยไม่ข้ามลำดับ!
+        </p>
+        <button type="button" class="btn btn-primary" id="playAgainBtn" style="width:100%; justify-content:center; padding: 12px 20px; font-size: 16px;">
+          เล่นอีกครั้งตั้งแต่ ก ไก่
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      // Complete 44 Thai consonants in strict order
+      const THAI_CONSONANTS = [
+        { char: 'ก', name: 'ก ไก่' },
+        { char: 'ข', name: 'ข ไข่' },
+        { char: 'ฃ', name: 'ฃ ขวด' },
+        { char: 'ค', name: 'ค ควาย' },
+        { char: 'ฅ', name: 'ฅ คน' },
+        { char: 'ฆ', name: 'ฆ ระฆัง' },
+        { char: 'ง', name: 'ง งู' },
+        { char: 'จ', name: 'จ จาน' },
+        { char: 'ฉ', name: 'ฉ ฉิ่ง' },
+        { char: 'ช', name: 'ช ช้าง' },
+        { char: 'ซ', name: 'ซ โซ่' },
+        { char: 'ฌ', name: 'ฌ เฌอ' },
+        { char: 'ญ', name: 'ญ หญิง' },
+        { char: 'ฎ', name: 'ฎ ชฎา' },
+        { char: 'ฏ', name: 'ฏ ปฏัก' },
+        { char: 'ฐ', name: 'ฐ ฐาน' },
+        { char: 'ฑ', name: 'ฑ มณโฑ' },
+        { char: 'ฒ', name: 'ฒ ผู้เฒ่า' },
+        { char: 'ณ', name: 'ณ เณร' },
+        { char: 'ด', name: 'ด เด็ก' },
+        { char: 'ต', name: 'ต เต่า' },
+        { char: 'ถ', name: 'ถ ถุง' },
+        { char: 'ท', name: 'ท ทหาร' },
+        { char: 'ธ', name: 'ธ ธง' },
+        { char: 'น', name: 'น หนู' },
+        { char: 'บ', name: 'บ ใบไม้' },
+        { char: 'ป', name: 'ป ปลา' },
+        { char: 'ผ', name: 'ผ ผึ้ง' },
+        { char: 'ฝ', name: 'ฝ ฝา' },
+        { char: 'พ', name: 'พ พาน' },
+        { char: 'ฟ', name: 'ฟ ฟัน' },
+        { char: 'ภ', name: 'ภ สำเภา' },
+        { char: 'ม', name: 'ม ม้า' },
+        { char: 'ย', name: 'ย ยักษ์' },
+        { char: 'ร', name: 'ร เรือ' },
+        { char: 'ล', name: 'ล ลิง' },
+        { char: 'ว', name: 'ว แหวน' },
+        { char: 'ศ', name: 'ศ ศาลา' },
+        { char: 'ษ', name: 'ษ ฤๅษี' },
+        { char: 'ส', name: 'ส เสือ' },
+        { char: 'ห', name: 'ห หีบ' },
+        { char: 'ฬ', name: 'ฬ จุฬา' },
+        { char: 'อ', name: 'อ อ่าง' },
+        { char: 'ฮ', name: 'ฮ นกฮูก' }
+      ];
+
+      const ACTIVE_BATCH_SIZE = 7; // 7 floating letters at a time
+
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+
+      const currentCharDisplay = document.getElementById('currentCharDisplay');
+      const currentCharName = document.getElementById('currentCharName');
+      const progressDisplay = document.getElementById('progressDisplay');
+      const sequenceTrack = document.getElementById('sequenceTrack');
+      const soundToggleBtn = document.getElementById('soundToggleBtn');
+      const restartBtn = document.getElementById('restartBtn');
+      const victoryModal = document.getElementById('victoryModal');
+      const playAgainBtn = document.getElementById('playAgainBtn');
+
+      // Audio Synthesizer (Web Audio API)
+      let audioCtx = null;
+      let soundEnabled = true;
+
+      function ensureAudio() {
+        if (!soundEnabled) return null;
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) {
+            audioCtx = new AudioContextClass();
+          }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        return audioCtx;
+      }
+
+      function playSound(type) {
+        const ac = ensureAudio();
+        if (!ac) return;
+        const now = ac.currentTime;
+
+        if (type === 'release') {
+          // Bowstring twang + arrow whoosh
+          const osc = ac.createOscillator();
+          const gain = ac.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(145, now);
+          osc.frequency.exponentialRampToValueAtTime(55, now + 0.18);
+          gain.gain.setValueAtTime(0.28, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+          osc.connect(gain);
+          gain.connect(ac.destination);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } else if (type === 'hit_correct') {
+          // Crisp bullseye thud + bright chime
+          const notes = [523.25, 659.25, 783.99];
+          notes.forEach((freq, i) => {
+            const osc = ac.createOscillator();
+            const gain = ac.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.055);
+            gain.gain.setValueAtTime(0.22, now + i * 0.055);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.055 + 0.28);
+            osc.connect(gain);
+            gain.connect(ac.destination);
+            osc.start(now + i * 0.055);
+            osc.stop(now + i * 0.055 + 0.29);
+          });
+        } else if (type === 'hit_wrong') {
+          // Deflect buzz / wooden clack when shooting out of order
+          const osc = ac.createOscillator();
+          const gain = ac.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(170, now);
+          osc.frequency.linearRampToValueAtTime(115, now + 0.22);
+          gain.gain.setValueAtTime(0.22, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+          osc.connect(gain);
+          gain.connect(ac.destination);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } else if (type === 'victory') {
+          const melody = [523.25, 659.25, 783.99, 1046.5];
+          melody.forEach((freq, idx) => {
+            const osc = ac.createOscillator();
+            const gain = ac.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.11);
+            gain.gain.setValueAtTime(0.26, now + idx * 0.11);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.11 + 0.45);
+            osc.connect(gain);
+            gain.connect(ac.destination);
+            osc.start(now + idx * 0.11);
+            osc.stop(now + idx * 0.11 + 0.46);
+          });
+        }
+      }
+
+      // Game State
+      let currentTargetIndex = 0; // Index in THAI_CONSONANTS (0 = ก)
+      let nextSpawnIndex = 0;     // Next index to spawn into the 7 floating targets
+      let floatingTargets = [];
+      let arrows = [];
+      let particles = [];
+      let floatingFeedbacks = [];
+      let clouds = [];
+
+      // Bow & Aiming State
+      const bow = {
+        x: 130,
+        y: 0,
+        angle: -0.35,
+        aimX: 500,
+        aimY: 300,
+        isDrawing: false,
+        drawPower: 0,      // 0..1
+        maxPower: 1,
+        stringVibration: 0,
+        stringVibPhase: 0
+      };
+
+      const GRAVITY = 0.26;
+      const MIN_ARROW_SPEED = 14;
+      const MAX_ARROW_SPEED = 29;
+
+      const TARGET_PALETTES = [
+        { rim: '#f59e0b', ring: '#fef3c7', core: '#b45309' },
+        { rim: '#10b981', ring: '#d1fae5', core: '#047857' },
+        { rim: '#3b82f6', ring: '#dbeafe', core: '#1d4ed8' },
+        { rim: '#ec4899', ring: '#fce7f3', core: '#be185d' },
+        { rim: '#8b5cf6', ring: '#ede9fe', core: '#6d28d9' },
+        { rim: '#06b6d4', ring: '#cffafe', core: '#0e7490' },
+        { rim: '#f97316', ring: '#ffedd5', core: '#c2410c' }
+      ];
+
+      function initClouds() {
+        clouds = [];
+        for (let i = 0; i < 6; i++) {
+          clouds.push({
+            x: Math.random() * window.innerWidth,
+            y: 70 + Math.random() * (window.innerHeight * 0.35),
+            scale: 0.6 + Math.random() * 0.7,
+            speed: 0.15 + Math.random() * 0.25
+          });
+        }
+      }
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        bow.x = Math.max(85, Math.min(160, canvas.width * 0.11));
+        bow.y = canvas.height - Math.max(125, canvas.height * 0.22);
+      }
+
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+      initClouds();
+
+      // Build bottom sequence bar
+      function renderSequenceBar() {
+        sequenceTrack.innerHTML = '';
+        const activeIndices = new Set(floatingTargets.map(t => t.index));
+        THAI_CONSONANTS.forEach((item, idx) => {
+          const el = document.createElement('div');
+          el.className = 'seq-node';
+          if (idx < currentTargetIndex) {
+            el.classList.add('done');
+          } else if (idx === currentTargetIndex) {
+            el.classList.add('current');
+          } else if (activeIndices.has(idx)) {
+            el.classList.add('onscreen');
+          }
+          el.textContent = item.char;
+          el.title = item.name;
+          el.id = `seq-node-${idx}`;
+          sequenceTrack.appendChild(el);
+        });
+
+        const currentEl = document.getElementById(`seq-node-${currentTargetIndex}`);
+        if (currentEl) {
+          currentEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+      }
+
+      function updateHUD() {
+        if (currentTargetIndex < THAI_CONSONANTS.length) {
+          const item = THAI_CONSONANTS[currentTargetIndex];
+          currentCharDisplay.textContent = item.char;
+          currentCharName.textContent = item.name;
+          progressDisplay.textContent = `${currentTargetIndex + 1} / ${THAI_CONSONANTS.length}`;
+        } else {
+          currentCharDisplay.textContent = 'ครบ!';
+          currentCharName.textContent = 'ก - ฮ สำเร็จ';
+          progressDisplay.textContent = `${THAI_CONSONANTS.length} / ${THAI_CONSONANTS.length}`;
+        }
+        renderSequenceBar();
+      }
+
+      // Spawn a single floating target so that 7 targets float at a time
+      function spawnTarget(consonantIndex, enterFromRight = true) {
+        const item = THAI_CONSONANTS[consonantIndex];
+        const palette = TARGET_PALETTES[consonantIndex % TARGET_PALETTES.length];
+        const radius = Math.max(32, Math.min(44, Math.min(canvas.width, canvas.height) * 0.052));
+
+        // Playable sky zone where targets float
+        const minX = Math.max(bow.x + 210, canvas.width * 0.28);
+        const maxX = canvas.width - radius - 28;
+        const minY = 105 + radius;
+        const maxY = canvas.height - 135 - radius;
+
+        // Find a non-overlapping position
+        let x = enterFromRight
+          ? canvas.width + radius + Math.random() * 90
+          : minX + Math.random() * Math.max(80, maxX - minX);
+        let y = minY + Math.random() * Math.max(80, maxY - minY);
+
+        for (let attempt = 0; attempt < 15; attempt++) {
+          const candidateX = enterFromRight
+            ? canvas.width + radius + (attempt * 22)
+            : minX + Math.random() * Math.max(80, maxX - minX);
+          const candidateY = minY + Math.random() * Math.max(80, maxY - minY);
+          const tooClose = floatingTargets.some(other => {
+            const dx = other.x - candidateX;
+            const dy = other.y - candidateY;
+            return Math.hypot(dx, dy) < radius * 2.35;
+          });
+          if (!tooClose) {
+            x = candidateX;
+            y = candidateY;
+            break;
+          }
+        }
+
+        const speed = 0.85 + Math.random() * 0.65;
+        const angle = enterFromRight
+          ? Math.PI + (Math.random() - 0.5) * 0.7
+          : Math.random() * Math.PI * 2;
+
+        floatingTargets.push({
+          index: consonantIndex,
+          char: item.char,
+          name: item.name,
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed * 0.75,
+          radius,
+          palette,
+          bobPhase: Math.random() * Math.PI * 2,
+          hitShake: 0,
+          scale: enterFromRight ? 0.9 : 1
+        });
+      }
+
+      // Spawn a batch of 7 letters at a time
+      function spawnNextWaveOfSeven() {
+        floatingTargets = [];
+        const waveCount = Math.min(ACTIVE_BATCH_SIZE, THAI_CONSONANTS.length - nextSpawnIndex);
+        for (let i = 0; i < waveCount; i++) {
+          spawnTarget(nextSpawnIndex, false);
+          nextSpawnIndex++;
+        }
+        updateHUD();
+      }
+
+      function resetGame() {
+        currentTargetIndex = 0;
+        nextSpawnIndex = 0;
+        floatingTargets = [];
+        arrows = [];
+        particles = [];
+        floatingFeedbacks = [];
+        bow.isDrawing = false;
+        bow.drawPower = 0;
+        victoryModal.classList.remove('visible');
+
+        // Spawn first 7 letters (ก ข ฃ ค ฅ ฆ ง)
+        spawnNextWaveOfSeven();
+      }
+
+      // Input handling for Aiming and Drawing the Bow
+      function updateAimFromPoint(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        const px = clientX - rect.left;
+        const py = clientY - rect.top;
+        bow.aimX = px;
+        bow.aimY = py;
+
+        const dx = px - bow.x;
+        const dy = py - bow.y;
+        let angle = Math.atan2(dy, dx);
+        // Clamp bow angle to forward hemisphere (-82 deg to +45 deg)
+        angle = Math.max(-1.43, Math.min(0.75, angle));
+        bow.angle = angle;
+      }
+
+      canvas.addEventListener('pointerdown', (e) => {
+        ensureAudio();
+        updateAimFromPoint(e.clientX, e.clientY);
+        bow.isDrawing = true;
+        bow.drawPower = 0.18;
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        updateAimFromPoint(e.clientX, e.clientY);
+      });
+
+      window.addEventListener('pointerup', () => {
+        if (!bow.isDrawing) return;
+        fireArrow();
+        bow.isDrawing = false;
+        bow.drawPower = 0;
+      });
+
+      function fireArrow() {
+        const power = Math.max(0.28, bow.drawPower);
+        const speed = MIN_ARROW_SPEED + power * (MAX_ARROW_SPEED - MIN_ARROW_SPEED);
+        const tipOffset = 46;
+        const startX = bow.x + Math.cos(bow.angle) * tipOffset;
+        const startY = bow.y + Math.sin(bow.angle) * tipOffset;
+
+        arrows.push({
+          x: startX,
+          y: startY,
+          vx: Math.cos(bow.angle) * speed,
+          vy: Math.sin(bow.angle) * speed,
+          angle: bow.angle,
+          active: true,
+          stuck: false,
+          alpha: 1,
+          trail: []
+        });
+
+        bow.stringVibration = 1.0;
+        bow.stringVibPhase = 0;
+        playSound('release');
+      }
+
+      function createExplosion(x, y, color) {
+        for (let i = 0; i < 24; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 1.5 + Math.random() * 6.5;
+          particles.push({
+            x,
+            y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 1.2,
+            size: 3 + Math.random() * 5,
+            color: i % 2 === 0 ? color : '#fef08a',
+            alpha: 1,
+            decay: 0.02 + Math.random() * 0.02
+          });
+        }
+      }
+
+      function addFeedbackText(x, y, text, color) {
+        floatingFeedbacks.push({
+          x,
+          y,
+          text,
+          color,
+          alpha: 1,
+          vy: -1.6
+        });
+      }
+
+      // Main Physics & Logic Update
+      function update() {
+        // Charge bow power while holding
+        if (bow.isDrawing) {
+          bow.drawPower = Math.min(bow.maxPower, bow.drawPower + 0.024);
+        }
+
+        // Bowstring vibration decay
+        if (bow.stringVibration > 0.01) {
+          bow.stringVibration *= 0.88;
+          bow.stringVibPhase += 1.4;
+        } else {
+          bow.stringVibration = 0;
+        }
+
+        // Clouds drift
+        for (const c of clouds) {
+          c.x -= c.speed;
+          if (c.x < -160) c.x = canvas.width + 140;
+        }
+
+        // Floating target boundaries (keep all 7 targets floating smoothly inside the sky zone)
+        const minX = Math.max(bow.x + 190, canvas.width * 0.25);
+        const maxX = canvas.width - 55;
+        const minY = 98;
+        const maxY = canvas.height - 125;
+
+        for (let i = 0; i < floatingTargets.length; i++) {
+          const t = floatingTargets[i];
+          t.bobPhase += 0.04;
+          t.x += t.vx;
+          t.y += t.vy + Math.sin(t.bobPhase) * 0.35;
+
+          if (t.hitShake > 0) {
+            t.hitShake *= 0.85;
+          }
+
+          // Gentle bounce inside playable sky area
+          if (t.x - t.radius < minX) {
+            t.x = minX + t.radius;
+            t.vx = Math.abs(t.vx);
+          } else if (t.x + t.radius > maxX) {
+            t.x = maxX - t.radius;
+            t.vx = -Math.abs(t.vx);
+          }
+
+          if (t.y - t.radius < minY) {
+            t.y = minY + t.radius;
+            t.vy = Math.abs(t.vy);
+          } else if (t.y + t.radius > maxY) {
+            t.y = maxY - t.radius;
+            t.vy = -Math.abs(t.vy);
+          }
+
+          // Soft separation between targets so letters remain easy to read and aim at
+          for (let j = i + 1; j < floatingTargets.length; j++) {
+            const other = floatingTargets[j];
+            const dx = other.x - t.x;
+            const dy = other.y - t.y;
+            const dist = Math.hypot(dx, dy);
+            const minDist = t.radius + other.radius + 14;
+            if (dist > 0 && dist < minDist) {
+              const overlap = (minDist - dist) * 0.035;
+              const nx = dx / dist;
+              const ny = dy / dist;
+              t.vx -= nx * overlap;
+              t.vy -= ny * overlap;
+              other.vx += nx * overlap;
+              other.vy += ny * overlap;
+            }
+          }
+
+          // Clamp target speed
+          const spd = Math.hypot(t.vx, t.vy);
+          if (spd > 1.85) {
+            t.vx = (t.vx / spd) * 1.85;
+            t.vy = (t.vy / spd) * 1.85;
+          } else if (spd < 0.45) {
+            t.vx *= 1.05;
+            t.vy *= 1.05;
+          }
+        }
+
+        // Update arrows and check collisions
+        for (let i = arrows.length - 1; i >= 0; i--) {
+          const arrow = arrows[i];
+          if (!arrow.active) {
+            arrow.alpha -= 0.03;
+            if (arrow.alpha <= 0) arrows.splice(i, 1);
+            continue;
+          }
+
+          arrow.trail.push({ x: arrow.x, y: arrow.y });
+          if (arrow.trail.length > 10) arrow.trail.shift();
+
+          arrow.x += arrow.vx;
+          arrow.y += arrow.vy;
+          arrow.vy += GRAVITY;
+          arrow.angle = Math.atan2(arrow.vy, arrow.vx);
+
+          // Tip position of arrow
+          const tipX = arrow.x + Math.cos(arrow.angle) * 26;
+          const tipY = arrow.y + Math.sin(arrow.angle) * 26;
+
+          // Check hit against floating targets
+          let hitHandled = false;
+          for (let j = floatingTargets.length - 1; j >= 0; j--) {
+            const target = floatingTargets[j];
+            const dist = Math.hypot(tipX - target.x, tipY - target.y);
+
+            if (dist <= target.radius + 6) {
+              hitHandled = true;
+              if (target.index === currentTargetIndex) {
+                // Correct letter in sequence!
+                playSound('hit_correct');
+                createExplosion(target.x, target.y, target.palette.rim);
+                addFeedbackText(target.x, target.y - 20, `✓ ${target.name}`, '#34d399');
+
+                floatingTargets.splice(j, 1);
+                arrow.active = false;
+                currentTargetIndex++;
+
+                // Keep 7 letters floating by spawning the next letter immediately (or completing the game)
+                if (nextSpawnIndex < THAI_CONSONANTS.length) {
+                  spawnTarget(nextSpawnIndex, true);
+                  nextSpawnIndex++;
+                }
+
+                updateHUD();
+
+                if (currentTargetIndex >= THAI_CONSONANTS.length) {
+                  playSound('victory');
+                  setTimeout(() => {
+                    victoryModal.classList.add('visible');
+                  }, 450);
+                }
+              } else {
+                // Wrong letter! Must not skip letters
+                playSound('hit_wrong');
+                target.hitShake = 12;
+                const requiredItem = THAI_CONSONANTS[currentTargetIndex];
+                addFeedbackText(
+                  target.x,
+                  target.y - target.radius - 12,
+                  `ห้ามข้ามลำดับ! ต้องยิง "${requiredItem.char}" ก่อน`,
+                  '#f87171'
+                );
+
+                // Deflect arrow realistically
+                arrow.vx = -arrow.vx * 0.35;
+                arrow.vy = -3.5;
+                arrow.active = false;
+              }
+              break;
+            }
+          }
+
+          if (hitHandled) continue;
+
+          // Out of bounds
+          if (arrow.x > canvas.width + 100 || arrow.x < -100 || arrow.y > canvas.height + 100) {
+            arrows.splice(i, 1);
+          }
+        }
+
+        // Update particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.14;
+          p.alpha -= p.decay;
+          if (p.alpha <= 0) particles.splice(i, 1);
+        }
+
+        // Update floating feedback messages
+        for (let i = floatingFeedbacks.length - 1; i >= 0; i--) {
+          const fb = floatingFeedbacks[i];
+          fb.y += fb.vy;
+          fb.alpha -= 0.018;
+          if (fb.alpha <= 0) floatingFeedbacks.splice(i, 1);
+        }
+      }
+
+      // Drawing the Range Scenery, Targets, Bow, Arrow & Trajectory
+      function drawBackground() {
+        // Sky gradient
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        skyGrad.addColorStop(0, '#0f172a');
+        skyGrad.addColorStop(0.55, '#1e3a5f');
+        skyGrad.addColorStop(0.82, '#334155');
+        skyGrad.addColorStop(1, '#1e293b');
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Soft sun glow
+        const sunGrad = ctx.createRadialGradient(
+          canvas.width * 0.78, canvas.height * 0.22, 10,
+          canvas.width * 0.78, canvas.height * 0.22, 220
+        );
+        sunGrad.addColorStop(0, 'rgba(251, 191, 36, 0.22)');
+        sunGrad.addColorStop(1, 'rgba(251, 191, 36, 0)');
+        ctx.fillStyle = sunGrad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Clouds
+        ctx.fillStyle = 'rgba(248, 250, 252, 0.08)';
+        for (const c of clouds) {
+          ctx.beginPath();
+          ctx.arc(c.x, c.y, 28 * c.scale, 0, Math.PI * 2);
+          ctx.arc(c.x + 24 * c.scale, c.y - 8 * c.scale, 34 * c.scale, 0, Math.PI * 2);
+          ctx.arc(c.x + 52 * c.scale, c.y, 26 * c.scale, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Distant mountain ridge
+        const groundY = canvas.height - 90;
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.moveTo(0, groundY);
+        ctx.lineTo(canvas.width * 0.22, groundY - 95);
+        ctx.lineTo(canvas.width * 0.48, groundY - 35);
+        ctx.lineTo(canvas.width * 0.76, groundY - 115);
+        ctx.lineTo(canvas.width, groundY - 45);
+        ctx.lineTo(canvas.width, canvas.height);
+        ctx.lineTo(0, canvas.height);
+        ctx.closePath();
+        ctx.fill();
+
+        // Archery range grass floor
+        const turfGrad = ctx.createLinearGradient(0, groundY - 15, 0, canvas.height);
+        turfGrad.addColorStop(0, '#14532d');
+        turfGrad.addColorStop(1, '#052e16');
+        ctx.fillStyle = turfGrad;
+        ctx.beginPath();
+        ctx.moveTo(0, groundY);
+        ctx.quadraticCurveTo(canvas.width * 0.5, groundY - 18, canvas.width, groundY);
+        ctx.lineTo(canvas.width, canvas.height);
+        ctx.lineTo(0, canvas.height);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function drawTrajectoryPreview() {
+        // Simulated trajectory curve based on current angle & draw power
+        const previewPower = bow.isDrawing ? Math.max(0.28, bow.drawPower) : 0.65;
+        const speed = MIN_ARROW_SPEED + previewPower * (MAX_ARROW_SPEED - MIN_ARROW_SPEED);
+        const tipOffset = 46;
+        let simX = bow.x + Math.cos(bow.angle) * tipOffset;
+        let simY = bow.y + Math.sin(bow.angle) * tipOffset;
+        let simVx = Math.cos(bow.angle) * speed;
+        let simVy = Math.sin(bow.angle) * speed;
+
+        const maxSteps = bow.isDrawing ? 34 : 16;
+        for (let step = 0; step < maxSteps; step++) {
+          simX += simVx;
+          simY += simVy;
+          simVy += GRAVITY;
+
+          if (step % 2 === 0) {
+            const alpha = (1 - step / maxSteps) * (bow.isDrawing ? 0.75 : 0.3);
+            ctx.fillStyle = bow.isDrawing
+              ? `rgba(251, 191, 36, ${alpha})`
+              : `rgba(226, 232, 240, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(simX, simY, bow.isDrawing ? 3.2 : 2.2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+
+      function drawBowAndArcher() {
+        // --- Draw Archer Character (Standing behind the bow) ---
+        const groundY = canvas.height - 90;
+        const archerX = bow.x - 45;
+        const archerY = bow.y;
+
+        // Quiver on the archer's back
+        ctx.save();
+        ctx.translate(archerX - 12, archerY + 8);
+        ctx.rotate(-0.4);
+        // Quiver body
+        ctx.fillStyle = '#7c2d12';
+        ctx.fillRect(-6, -24, 12, 34);
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(-6, -24, 12, 34);
+        // Arrow shafts sticking out
+        ctx.strokeStyle = '#fde68a';
+        ctx.lineWidth = 2;
+        for (let i = -4; i <= 4; i += 4) {
+          ctx.beginPath();
+          ctx.moveTo(i, -24);
+          ctx.lineTo(i * 1.5, -42);
+          ctx.stroke();
+          // Feathers
+          ctx.fillStyle = '#ef4444';
+          ctx.beginPath();
+          ctx.moveTo(i * 1.5, -36);
+          ctx.lineTo(i * 1.5 - 3, -42);
+          ctx.lineTo(i * 1.5 + 3, -42);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // Legs
+        ctx.strokeStyle = '#1e293b'; // Pants
+        ctx.lineWidth = 10;
+        ctx.lineCap = 'round';
+        // Left Leg
+        ctx.beginPath();
+        ctx.moveTo(archerX - 8, archerY + 36);
+        ctx.lineTo(archerX - 12, groundY);
+        ctx.stroke();
+        // Right Leg
+        ctx.beginPath();
+        ctx.moveTo(archerX + 8, archerY + 36);
+        ctx.lineTo(archerX + 6, groundY);
+        ctx.stroke();
+
+        // Boots
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(archerX - 18, groundY - 4, 10, 6);
+        ctx.fillRect(archerX + 2, groundY - 4, 10, 6);
+
+        // Torso / Archer's clothes (Green tunic)
+        ctx.fillStyle = '#166534';
+        ctx.beginPath();
+        ctx.moveTo(archerX - 14, archerY - 10);
+        ctx.lineTo(archerX + 14, archerY - 10);
+        ctx.lineTo(archerX + 10, archerY + 36);
+        ctx.lineTo(archerX - 10, archerY + 36);
+        ctx.closePath();
+        ctx.fill();
+
+        // Belt
+        ctx.fillStyle = '#78350f';
+        ctx.fillRect(archerX - 11, archerY + 14, 22, 6);
+        // Belt buckle
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillRect(archerX - 3, archerY + 13, 6, 8);
+
+        // Head and Hood
+        const headX = archerX;
+        const headY = archerY - 28;
+        // Face skin
+        ctx.fillStyle = '#fbcfe8'; // rosy skin
+        ctx.beginPath();
+        ctx.arc(headX, headY, 12, 0, Math.PI * 2);
+        ctx.fill();
+        // Eyes looking towards the target
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(headX + 6, headY - 2, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+        // Green Hood
+        ctx.fillStyle = '#15803d';
+        ctx.beginPath();
+        ctx.arc(headX - 2, headY - 1, 13.5, -Math.PI * 0.8, Math.PI * 0.8);
+        ctx.lineTo(headX - 16, headY + 10);
+        ctx.closePath();
+        ctx.fill();
+
+        // Left Arm holding the bow (Extends directly to bow pivot)
+        const bowPivotAbsoluteX = bow.x;
+        const bowPivotAbsoluteY = bow.y;
+        ctx.strokeStyle = '#166534';
+        ctx.lineWidth = 8;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(archerX + 10, archerY - 6); // Left shoulder
+        ctx.lineTo(bowPivotAbsoluteX, bowPivotAbsoluteY); // Hand on bow grip
+        ctx.stroke();
+
+        // Right Arm pulling the string
+        const pullDist = bow.isDrawing ? bow.drawPower * 44 : 0;
+        const flex = bow.isDrawing ? bow.drawPower * 10 : 0;
+        const bowHeight = 68;
+
+        // Relate string position to absolute space to connect the hand
+        const stringMidXRotated = -12 - pullDist;
+        const cosA = Math.cos(bow.angle);
+        const sinA = Math.sin(bow.angle);
+        const stringMidAbsoluteX = bow.x + stringMidXRotated * cosA;
+        const stringMidAbsoluteY = bow.y + stringMidXRotated * sinA;
+
+        // Draw Right Arm (Shoulder -> bent Elbow -> String hand)
+        const rightShoulderX = archerX - 10;
+        const rightShoulderY = archerY - 4;
+        const elbowX = rightShoulderX - 18 - pullDist * 0.3;
+        const elbowY = rightShoulderY - 8 + (bow.angle * 12);
+
+        ctx.strokeStyle = '#15803d';
+        ctx.lineWidth = 7.5;
+        ctx.beginPath();
+        ctx.moveTo(rightShoulderX, rightShoulderY);
+        ctx.lineTo(elbowX, elbowY);
+        ctx.lineTo(stringMidAbsoluteX, stringMidAbsoluteY);
+        ctx.stroke();
+
+        // Hand holding the string (rosy skin)
+        ctx.fillStyle = '#fbcfe8';
+        ctx.beginPath();
+        ctx.arc(stringMidAbsoluteX, stringMidAbsoluteY, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+
+        // --- Draw the actual Bow ---
+        ctx.save();
+        ctx.translate(bow.x, bow.y);
+
+        // Wooden stand / base shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+        ctx.beginPath();
+        ctx.ellipse(0, 58, 22, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Rotate bow to aiming angle
+        ctx.rotate(bow.angle);
+
+        // Upper and lower limb endpoints
+        const topTipX = -10 - flex;
+        const topTipY = -bowHeight + flex * 0.4;
+        const botTipX = -10 - flex;
+        const botTipY = bowHeight - flex * 0.4;
+
+        // Bowstring with realistic release vibration
+        const vibOffset = Math.sin(bow.stringVibPhase) * bow.stringVibration * 9;
+        const stringMidX = -12 - pullDist + vibOffset;
+        const stringMidY = 0;
+
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(topTipX, topTipY);
+        ctx.lineTo(stringMidX, stringMidY);
+        ctx.lineTo(botTipX, botTipY);
+        ctx.stroke();
+
+        // Recurve Bow Riser & Limbs
+        const bowGrad = ctx.createLinearGradient(-15, -bowHeight, 22, bowHeight);
+        bowGrad.addColorStop(0, '#fbbf24');
+        bowGrad.addColorStop(0.25, '#b45309');
+        bowGrad.addColorStop(0.5, '#78350f');
+        bowGrad.addColorStop(0.75, '#b45309');
+        bowGrad.addColorStop(1, '#fbbf24');
+
+        ctx.strokeStyle = bowGrad;
+        ctx.lineWidth = 8;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(topTipX, topTipY);
+        ctx.quadraticCurveTo(22, -bowHeight * 0.45, 12, 0);
+        ctx.quadraticCurveTo(22, bowHeight * 0.45, botTipX, botTipY);
+        ctx.stroke();
+
+        // Leather grip wrap
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 10;
+        ctx.beginPath();
+        ctx.moveTo(11, -10);
+        ctx.lineTo(11, 10);
+        ctx.stroke();
+
+        // Sight pin on bow
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(14, -18);
+        ctx.lineTo(28, -18);
+        ctx.stroke();
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.arc(28, -18, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Nocked arrow ready on the bow
+        const arrowTailX = stringMidX;
+        const arrowLength = 74;
+        drawArrowShape(arrowTailX, 0, arrowLength);
+
+        // Draw Power Tension Gauge beside bow when drawing
+        if (bow.isDrawing) {
+          const pct = Math.round(bow.drawPower * 100);
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+          ctx.fillRect(-38, -94, 76, 10);
+          ctx.fillStyle = bow.drawPower > 0.8 ? '#10b981' : '#f59e0b';
+          ctx.fillRect(-36, -92, 72 * bow.drawPower, 6);
+          ctx.fillStyle = '#f8fafc';
+          ctx.font = '600 11px Prompt, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(`แรงดึง ${pct}%`, 0, -100);
+        }
+
+        ctx.restore();
+      }
+
+      function drawArrowShape(tailX, tailY, length) {
+        const tipX = tailX + length;
+
+        // Shaft
+        ctx.strokeStyle = '#fde68a';
+        ctx.lineWidth = 3.2;
+        ctx.beginPath();
+        ctx.moveTo(tailX, tailY);
+        ctx.lineTo(tipX - 10, tailY);
+        ctx.stroke();
+
+        // Fletching feathers
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.moveTo(tailX + 2, tailY);
+        ctx.lineTo(tailX + 14, tailY - 6);
+        ctx.lineTo(tailX + 18, tailY);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#f59e0b';
+        ctx.beginPath();
+        ctx.moveTo(tailX + 2, tailY);
+        ctx.lineTo(tailX + 14, tailY + 6);
+        ctx.lineTo(tailX + 18, tailY);
+        ctx.closePath();
+        ctx.fill();
+
+        // Steel broadhead tip
+        ctx.fillStyle = '#e2e8f0';
+        ctx.beginPath();
+        ctx.moveTo(tipX, tailY);
+        ctx.lineTo(tipX - 13, tailY - 5.5);
+        ctx.lineTo(tipX - 10, tailY);
+        ctx.lineTo(tipX - 13, tailY + 5.5);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function drawFlyingArrows() {
+        for (const arrow of arrows) {
+          // Wind trail
+          if (arrow.trail.length > 1) {
+            ctx.save();
+            ctx.strokeStyle = `rgba(254, 240, 138, ${0.32 * arrow.alpha})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(arrow.trail[0].x, arrow.trail[0].y);
+            for (let i = 1; i < arrow.trail.length; i++) {
+              ctx.lineTo(arrow.trail[i].x, arrow.trail[i].y);
+            }
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          ctx.save();
+          ctx.globalAlpha = arrow.alpha;
+          ctx.translate(arrow.x, arrow.y);
+          ctx.rotate(arrow.angle);
+          drawArrowShape(-36, 0, 64);
+          ctx.restore();
+        }
+      }
+
+      function drawTargets() {
+        // Draw non-current targets first, then current target on top
+        const sortedTargets = [...floatingTargets].sort((a, b) => {
+          if (a.index === currentTargetIndex) return 1;
+          if (b.index === currentTargetIndex) return -1;
+          return b.index - a.index;
+        });
+
+        for (const t of sortedTargets) {
+          const isNextRequired = t.index === currentTargetIndex;
+          const shakeX = t.hitShake ? Math.sin(t.hitShake * 2.5) * t.hitShake : 0;
+
+          ctx.save();
+          ctx.translate(t.x + shakeX, t.y);
+
+          // Balloon / Target suspension string
+          ctx.strokeStyle = 'rgba(226, 232, 240, 0.35)';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(0, t.radius);
+          ctx.quadraticCurveTo(Math.sin(t.bobPhase) * 6, t.radius + 16, 0, t.radius + 28);
+          ctx.stroke();
+
+          // Outer glow if it is the current target in sequence
+          if (isNextRequired) {
+            const pulse = 1 + Math.sin( performance.now() * 0.007 ) * 0.08;
+            ctx.save();
+            ctx.strokeStyle = 'rgba(251, 191, 36, 0.75)';
+            ctx.lineWidth = 3.5;
+            ctx.setLineDash([6, 5]);
+            ctx.beginPath();
+            ctx.arc(0, 0, (t.radius + 10) * pulse, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          // Target outer shadow
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+          ctx.shadowBlur = 12;
+          ctx.shadowOffsetY = 5;
+
+          // Concentric Archery Target Disc
+          ctx.fillStyle = t.palette.rim;
+          ctx.beginPath();
+          ctx.arc(0, 0, t.radius, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.shadowColor = 'transparent';
+
+          // Middle light ring
+          ctx.fillStyle = t.palette.ring;
+          ctx.beginPath();
+          ctx.arc(0, 0, t.radius * 0.82, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Inner bullseye circle
+          ctx.fillStyle = '#0f172a';
+          ctx.beginPath();
+          ctx.arc(0, 0, t.radius * 0.66, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Specular highlight
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
+          ctx.beginPath();
+          ctx.ellipse(-t.radius * 0.28, -t.radius * 0.32, t.radius * 0.32, t.radius * 0.16, -0.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Thai Consonant Letter
+          ctx.fillStyle = isNextRequired ? '#fde047' : '#f8fafc';
+          ctx.font = `800 ${Math.round(t.radius * 0.86)}px Prompt, Sarabun, sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(t.char, 0, 2);
+
+          ctx.restore();
+        }
+      }
+
+      function drawAimSight() {
+        ctx.save();
+        ctx.translate(bow.aimX, bow.aimY);
+
+        const radius = bow.isDrawing ? 20 - bow.drawPower * 6 : 18;
+        ctx.strokeStyle = bow.isDrawing ? '#fbbf24' : 'rgba(248, 250, 252, 0.65)';
+        ctx.lineWidth = 1.8;
+
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Crosshair ticks
+        ctx.beginPath();
+        ctx.moveTo(-radius - 6, 0);
+        ctx.lineTo(-radius + 4, 0);
+        ctx.moveTo(radius - 4, 0);
+        ctx.lineTo(radius + 6, 0);
+        ctx.moveTo(0, -radius - 6);
+        ctx.lineTo(0, -radius + 4);
+        ctx.moveTo(0, radius - 4);
+        ctx.lineTo(0, radius + 6);
+        ctx.stroke();
+
+        // Center dot
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      function drawParticlesAndFeedback() {
+        for (const p of particles) {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.alpha);
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        for (const fb of floatingFeedbacks) {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, fb.alpha);
+          ctx.font = '700 16px Prompt, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#0f172a';
+          ctx.fillText(fb.text, fb.x + 1, fb.y + 1);
+          ctx.fillStyle = fb.color;
+          ctx.fillText(fb.text, fb.x, fb.y);
+          ctx.restore();
+        }
+      }
+
+      function gameLoop() {
+        update();
+        drawBackground();
+        drawTrajectoryPreview();
+        drawTargets();
+        drawFlyingArrows();
+        drawBowAndArcher();
+        drawParticlesAndFeedback();
+        drawAimSight();
+        requestAnimationFrame(gameLoop);
+      }
+
+      // Controls
+      soundToggleBtn.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        soundToggleBtn.textContent = soundEnabled ? '🔊 เสียง: เปิด' : '🔇 เสียง: ปิด';
+      });
+
+      restartBtn.addEventListener('click', () => {
+        resetGame();
+      });
+
+      playAgainBtn.addEventListener('click', () => {
+        resetGame();
+      });
+
+      // Start the game
+      resetGame();
+      requestAnimationFrame(gameLoop);
+    })();
+  </script>
+</body>
+</html>
